@@ -1,0 +1,32 @@
+# Render Blueprint — one web service serves both the React site and the Express API.
+# Deploy: https://render.com/deploy?repo=https://github.com/manthandhrana/portfolio
+services:
+  - type: web
+    name: portfolio
+    runtime: node
+    plan: free # free sleeps after 15 min idle and has no persistent disk — use "starter" + a disk for uploads
+    region: singapore
+    # devDependencies (vite) are needed to build the client, so include them explicitly
+    buildCommand: npm --prefix server install --omit=dev && npm --prefix client install --include=dev && npm --prefix client run build
+    startCommand: npm --prefix server start
+    healthCheckPath: /api/health
+    autoDeploy: true
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: NODE_VERSION
+        value: 22
+      - key: TRUST_PROXY
+        value: 1
+      - key: JWT_SECRET
+        generateValue: true
+
+      # --- set these in the Render dashboard (never commit them) ---
+      - key: MONGODB_URI
+        sync: false
+      - key: ADMIN_EMAIL
+        sync: false
+      - key: ADMIN_PASSWORD
+        sync: false
+      - key: GITHUB_TOKEN
+        sync: false
